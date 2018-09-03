@@ -6,12 +6,17 @@
     <div class='row'>
       <div class='col-md-2'>Filter by:</div>
       <div class='col-md-4'>
-
+        <!-- square brackets for property binding, parenthesis event binding (text typed) -->
+        <!-- Check ProductListComponent
+             read    get listFilter()     property binding
+             write   set listFilter()     data typed in binding
+        -->
+        <input type='text' [(ngModel)]='listFilter' title="filter">
       </div>
     </div>
     <div class='row'>
       <div class='col-md-6'>
-        <h4>Filtered by:</h4>
+        <h4>Filtered by: {{listFilter}}</h4>
       </div>
     </div>
     <div class='table-responsive'>
@@ -19,7 +24,10 @@
         <thead>
         <tr>
           <th>
-            <button class='btn btn-primary'>Show image</button>
+            <button class='btn btn-primary'
+                    (click)="toggleImage()">
+              {{showImage? 'Hide Image': 'Show Image'}}
+            </button>
           </th>
           <th>Product</th>
           <th>Code</th>
@@ -29,23 +37,26 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor='let product of products'>
+        <!-- directive binding with *ngFor, here "of" is used and corresponds to ES2015 for let ... of loop (loops on values)
+              which differs from for ... in loop, that loops on properties -->
+        <tr *ngFor='let product of filteredProducts'>
           <td>
-            <img
+            <!-- Property binding is preferred to interpolation, interpolation for string based data,
+                     state of html controls like buttons, disabling them will only work with property binding -->
+            <img *ngIf='showImage'
                  [src]='product.imageUrl'
                  [title]='product.productName'
                  [style.width.px]='imageWidth'
                  [style.margin.px]='imageMargin'>
           </td>
           <td>
-            {{product.productName}}
+            <a [routerLink] ="['/products', product.productId]">{{product.productName}}</a>
           </td>
-          <td>{{ product.productCode | lowercase}}</td>
+          <td>{{ product.productCode | lowercase | convertToSpaces: '-' }}</td>
           <td>{{ product.releaseDate }}</td>
           <td>{{ product.price | currency:'USD':'symbol':'1.2-2' }}</td>
           <td>
-            <!--pm-star>
-            </pm-star -->
+            <pm-star [rating]='product.starRating' (ratingClicked)='onRatingClicked($event)'></pm-star>
           </td>
         </tr>
         </tbody>
